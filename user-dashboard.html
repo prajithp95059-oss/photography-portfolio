@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Client Dashboard | Stackly Photography</title>
+<meta name="description" content="Your Stackly Photography client dashboard: galleries, bookings, upcoming shoots and invoices.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="stackly-logo.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --forest:#1f3d2b;
+  --forest-deep:#152a1e;
+  --forest-mid:#2c5a40;
+  --sage:#a3b18a;
+  --sage-soft:#c5d0b0;
+  --sand:#e6d8ba;
+  --sand-deep:#d6c59f;
+  --cream:#f8f2e2;
+  --paper:#fbf7ea;
+  --bark:#4a3b2a;
+  --ink:#1b2a20;
+  --ink-soft:#5a5a48;
+  --line:rgba(31,61,43,.16);
+  --err:#a3402b;
+  --head:'Bricolage Grotesque',system-ui,sans-serif;
+  --body:'Newsreader',Georgia,serif;
+  --r:12px;
+  --ease:cubic-bezier(.22,.9,.3,1);
+  --sb-w:272px;
+  --tb-h:76px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--sand);color:var(--ink);font-family:var(--body);font-size:1.0625rem;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+input,select{font:inherit}
+h1,h2,h3,h4{font-family:var(--head);font-weight:800;letter-spacing:-.02em;line-height:1.1;color:var(--forest)}
+p{color:var(--ink-soft)}
+:focus-visible{outline:3px solid var(--sage);outline-offset:3px}
+.wordmark{font-family:var(--head);font-weight:800;font-size:1.5rem;letter-spacing:-.02em;color:var(--cream);line-height:1;display:inline-block}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+svg.i{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- shell ---------- */
+.shell{display:flex;min-height:100vh;min-height:100dvh}
+.scrim{position:fixed;inset:0;background:rgba(21,42,30,.55);opacity:0;visibility:hidden;transition:opacity .35s;z-index:300}
+.scrim.show{opacity:1;visibility:visible}
+.sidebar{width:var(--sb-w);flex-shrink:0;background:var(--forest);color:var(--cream);display:flex;flex-direction:column;padding:26px 18px;position:sticky;top:0;height:100vh;height:100dvh;overflow-y:auto}
+.sb-head{padding:0 8px;margin-bottom:22px}
+.sb-head img{height:42px;width:auto}
+.sb-tag{font-family:var(--head);font-size:.7rem;font-weight:600;letter-spacing:.18em;color:var(--sage);padding:0 10px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.sb-tag::before{content:"";width:22px;height:2px;background:var(--sage)}
+.sb-group{margin-bottom:18px}
+.sb-label{font-family:var(--head);font-size:.68rem;font-weight:600;letter-spacing:.16em;color:var(--sage-soft);opacity:.75;padding:0 12px;margin-bottom:6px}
+.sb-nav{display:flex;flex-direction:column;gap:3px}
+.sb-link{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:var(--r);font-family:var(--head);font-weight:600;font-size:.95rem;color:rgba(248,242,226,.86);transition:background .25s,color .25s;min-height:44px}
+.sb-link:hover{background:rgba(248,242,226,.1);color:var(--cream)}
+.sb-link.active{background:var(--sage);color:var(--forest-deep)}
+.sb-badge{margin-left:auto;font-size:.72rem;font-weight:600;background:rgba(248,242,226,.16);color:var(--cream);padding:2px 9px;border-radius:999px}
+.sb-link.active .sb-badge{background:rgba(21,42,30,.16);color:var(--forest-deep)}
+.sb-spacer{flex:1;min-height:16px}
+.sb-profile{display:flex;align-items:center;gap:12px;padding:14px 10px;border-top:1px solid rgba(248,242,226,.16)}
+.sb-avatar{width:40px;height:40px;border-radius:50%;background:var(--sage);color:var(--forest-deep);display:flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:800;font-size:1rem;flex:none}
+.sb-profile-info{min-width:0}
+.sb-profile-info strong{display:block;font-family:var(--head);font-weight:600;font-size:.95rem;color:var(--cream);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-profile-info span{display:block;font-size:.8rem;color:var(--sage-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-foot{display:flex;flex-direction:column;gap:3px;margin-top:4px}
+.sb-link.logout:hover{background:rgba(163,64,43,.35)}
+
+.main{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--sand)}
+.topbar{min-height:var(--tb-h);position:sticky;top:0;z-index:50;background:rgba(248,242,226,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px clamp(16px,2.5vw,32px)}
+.tb-left,.tb-right{display:flex;align-items:center;gap:14px;min-width:0}
+.tb-crumb{display:block;font-family:var(--head);font-size:.7rem;font-weight:600;letter-spacing:.16em;color:var(--forest-mid);margin-bottom:2px}
+.tb-title h1{font-size:1.5rem}
+.sb-toggle{display:none;width:44px;height:44px;border-radius:var(--r);border:1px solid var(--line);background:var(--paper);align-items:center;justify-content:center;flex-shrink:0}
+.sb-toggle span{display:block;width:18px;height:2px;background:var(--forest);position:relative}
+.sb-toggle span::before,.sb-toggle span::after{content:"";position:absolute;left:0;width:18px;height:2px;background:var(--forest)}
+.sb-toggle span::before{top:-6px}
+.sb-toggle span::after{top:6px}
+.tb-search{display:flex;align-items:center;gap:8px;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:9px 16px;width:240px;transition:border-color .3s,width .3s}
+.tb-search:focus-within{border-color:var(--forest);width:290px}
+.tb-search svg{width:16px;height:16px;stroke:var(--ink-soft);fill:none;stroke-width:2;flex-shrink:0}
+.tb-search input{border:none;outline:none;background:transparent;font-size:.95rem;width:100%;color:var(--ink)}
+.tb-bell{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--paper);display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;transition:border-color .3s}
+.tb-bell:hover{border-color:var(--forest)}
+.tb-bell svg{width:19px;height:19px;stroke:var(--forest);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.tb-bell::after{content:"";position:absolute;top:10px;right:11px;width:9px;height:9px;border-radius:50%;background:var(--sage);border:2px solid var(--paper)}
+.tb-user{display:flex;align-items:center;gap:11px;padding-left:16px;border-left:1px solid var(--line);flex-shrink:0}
+.tb-user .sb-avatar{background:var(--forest);color:var(--cream)}
+.tb-user-info{display:none;line-height:1.2}
+.tb-user-info strong{display:block;font-family:var(--head);font-weight:600;font-size:.95rem;color:var(--forest)}
+.tb-user-info span{font-size:.82rem;color:var(--ink-soft)}
+@media (min-width:700px){.tb-user-info{display:block}}
+
+.content{padding:clamp(16px,2.5vw,32px);flex:1}
+.view-panel{display:none}
+.view-panel.active{display:block;animation:viewIn .45s var(--ease)}
+@keyframes viewIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.view-panel > .panel{margin-bottom:20px}
+
+/* ---------- welcome banner ---------- */
+.welcome{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(120deg,var(--forest-deep),var(--forest-mid));color:var(--cream);border-radius:var(--r);padding:clamp(28px,3.4vw,40px) clamp(30px,3.6vw,46px);margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.welcome::before,.welcome::after{content:"";position:absolute;width:26px;height:26px;border:2px solid var(--cream);opacity:.55;pointer-events:none}
+.welcome::before{top:12px;left:12px;border-right:0;border-bottom:0}
+.welcome::after{bottom:12px;right:12px;border-left:0;border-top:0}
+.welcome h2{color:var(--cream);font-size:clamp(1.5rem,2.4vw,2rem);margin-bottom:6px}
+.welcome p{color:var(--sage-soft);max-width:56ch;font-size:1.05rem}
+.btn-accent{display:inline-flex;align-items:center;gap:8px;background:var(--sage);color:var(--forest-deep);border:2px solid var(--sage);border-radius:999px;padding:11px 24px;font-family:var(--head);font-weight:600;font-size:.95rem;min-height:46px;transition:background .3s,color .3s,border-color .3s,transform .3s}
+.btn-accent:hover{background:var(--cream);color:var(--forest);border-color:var(--cream);transform:translateY(-2px)}
+
+/* ---------- stats ---------- */
+.stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-bottom:20px}
+.stat-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:14px;transition:transform .35s var(--ease),box-shadow .35s}
+.stat-card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(21,42,30,.12)}
+.stat-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.stat-icon{width:44px;height:44px;border-radius:var(--r);display:flex;align-items:center;justify-content:center}
+.ic-forest{background:rgba(31,61,43,.12);color:var(--forest)}
+.ic-sage{background:rgba(163,177,138,.4);color:var(--forest)}
+.ic-bark{background:rgba(74,59,42,.12);color:var(--bark)}
+.ic-sand{background:rgba(214,197,159,.6);color:var(--bark)}
+.stat-delta{font-family:var(--head);font-size:.78rem;font-weight:600;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.stat-delta.up{background:rgba(163,177,138,.4);color:var(--forest)}
+.stat-delta.down{background:rgba(163,64,43,.14);color:var(--err)}
+.stat-delta.neutral{background:rgba(74,59,42,.1);color:var(--bark)}
+.stat-val{font-family:var(--head);font-size:2.1rem;font-weight:800;color:var(--forest);line-height:1;overflow-wrap:anywhere}
+.stat-label{font-size:.98rem;color:var(--ink-soft);margin-top:6px}
+
+/* ---------- panels ---------- */
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:22px clamp(16px,2.4vw,28px);min-width:0}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+.panel-head h3{font-size:1.25rem}
+.eyebrow{font-family:var(--head);font-size:.72rem;font-weight:600;color:var(--forest-mid);letter-spacing:.16em;text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.eyebrow::before{content:"";width:20px;height:2px;background:var(--sage);flex-shrink:0}
+.panel-link{font-family:var(--head);font-size:.85rem;font-weight:600;color:var(--forest);flex-shrink:0;transition:color .25s}
+.panel-link:hover{color:var(--bark)}
+.panel-link:hover{color:var(--bark)}
+.panel-tabs{display:flex;gap:4px;background:var(--sand);border-radius:999px;padding:4px}
+.panel-tabs button{font-family:var(--head);font-size:.8rem;font-weight:600;padding:6px 14px;border-radius:999px;color:var(--bark);min-height:32px;transition:background .3s,color .3s}
+.panel-tabs button.active{background:var(--forest);color:var(--cream)}
+.panel-sub{font-size:1rem;color:var(--ink-soft);margin-top:-10px;margin-bottom:18px}
+.chart-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:18px;margin-bottom:20px}
+.lower-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px}
+.chart-box{position:relative;height:280px}
+.chart-box.short{height:230px}
+.legend-row{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:14px}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:.92rem;color:var(--ink-soft)}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex:none}
+.chart-wrap-gap{margin-bottom:20px}
+
+/* tables */
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.dtable{width:100%;border-collapse:collapse;min-width:520px}
+.dtable th{text-align:left;font-family:var(--head);font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);padding:0 10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+.dtable td{padding:13px 10px;border-bottom:1px solid var(--line);font-size:1rem;vertical-align:middle}
+.dtable tr:last-child td{border-bottom:0}
+.dtable .amt{font-family:var(--head);font-weight:600;color:var(--forest);white-space:nowrap}
+.cell-user{display:flex;align-items:center;gap:12px}
+.cell-user strong{display:block;font-family:var(--head);font-weight:600;font-size:.95rem;color:var(--forest)}
+.cell-user span{font-size:.85rem;color:var(--ink-soft)}
+.client-avatar{width:36px;height:36px;border-radius:50%;background:var(--sage-soft);color:var(--forest);display:flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:800;font-size:.8rem;flex:none}
+.tag{display:inline-block;font-family:var(--head);font-size:.76rem;font-weight:600;padding:4px 11px;border-radius:999px;white-space:nowrap}
+.tag.ok{background:rgba(163,177,138,.45);color:var(--forest)}
+.tag.warn{background:rgba(214,197,159,.7);color:var(--bark)}
+.tag.bad{background:rgba(163,64,43,.15);color:var(--err)}
+.tag.muted{background:rgba(74,59,42,.1);color:var(--bark)}
+.progress-track{width:100%;min-width:90px;height:8px;border-radius:4px;background:var(--sand);overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--forest),var(--sage))}
+.btn-mini{align-self:flex-start;font-family:var(--head);font-size:.82rem;font-weight:600;color:var(--forest);border:1.5px solid rgba(31,61,43,.4);border-radius:999px;padding:6px 16px;min-height:34px;transition:background .3s,color .3s}
+.btn-mini:hover{background:var(--forest);color:var(--cream)}
+
+/* lists */
+.plist-item{display:flex;align-items:center;gap:14px;padding:14px 2px;border-bottom:1px solid var(--line)}
+.plist-item:last-child{border-bottom:0}
+.plist-body{flex:1;min-width:0}
+.plist-body strong{display:block;font-family:var(--head);font-weight:600;font-size:.98rem;color:var(--forest)}
+.plist-body span{font-size:.9rem;color:var(--ink-soft)}
+.plist-val{font-family:var(--head);font-weight:600;font-size:.85rem;color:var(--bark);white-space:nowrap}
+.plist-stage{width:10px;height:10px;border-radius:50%;flex:none}
+.date-chip{width:52px;flex-shrink:0;text-align:center;background:var(--sand);border-radius:var(--r);padding:6px 0;line-height:1.1}
+.date-chip b{display:block;font-family:var(--head);font-size:1.2rem;font-weight:800;color:var(--forest)}
+.date-chip small{font-family:var(--head);font-size:.64rem;font-weight:600;letter-spacing:.1em;color:var(--forest-mid)}
+
+/* gallery grid (client) */
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
+.gallery-card{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--cream);display:flex;flex-direction:column;transition:transform .35s var(--ease),box-shadow .35s}
+.gallery-card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(21,42,30,.14)}
+.gallery-card .thumb{aspect-ratio:4/3;overflow:hidden;background:var(--sage-soft)}
+.gallery-card .thumb img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease)}
+.gallery-card:hover .thumb img{transform:scale(1.06)}
+.gallery-card .gc-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.gallery-card h4{font-size:1.05rem}
+.gallery-card .gc-meta{font-size:.9rem;color:var(--ink-soft)}
+.gallery-card .gc-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:auto;padding-top:8px}
+
+/* team + reports */
+.team-grid,.reports-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.team-card,.report-card{border:1px solid var(--line);border-radius:var(--r);padding:18px;background:var(--cream);min-width:0;display:flex;flex-direction:column;gap:10px}
+.tc-top{display:flex;align-items:center;gap:12px}
+.tc-avatar{width:46px;height:46px;border-radius:50%;background:var(--forest);color:var(--cream);display:flex;align-items:center;justify-content:center;font-family:var(--head);font-weight:800;font-size:.95rem;flex:none}
+.tc-top strong{display:block;font-family:var(--head);font-weight:600;color:var(--forest)}
+.tc-role{font-size:.9rem;color:var(--ink-soft)}
+.tc-meta{display:flex;justify-content:space-between;gap:8px;font-size:.9rem;color:var(--ink-soft)}
+.rc-icon{width:40px;height:40px;border-radius:var(--r);background:rgba(163,177,138,.4);color:var(--forest);display:flex;align-items:center;justify-content:center}
+.report-card strong{font-family:var(--head);font-weight:600;color:var(--forest)}
+.report-card span{font-size:.92rem;color:var(--ink-soft)}
+.report-card .btn-mini{margin-top:auto}
+
+/* messages */
+.msg-item{display:flex;gap:14px;padding:16px 2px;border-bottom:1px solid var(--line);align-items:flex-start}
+.msg-item:last-child{border-bottom:0}
+.msg-body{flex:1;min-width:0}
+.msg-body strong{font-family:var(--head);font-weight:600;color:var(--forest)}
+.msg-body p{margin-top:2px}
+.msg-time{font-size:.85rem;color:var(--ink-soft);flex-shrink:0}
+.unread{width:9px;height:9px;border-radius:50%;background:var(--sage);display:inline-block;margin-left:8px}
+
+/* settings */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.field label{display:block;font-family:var(--head);font-size:.85rem;font-weight:600;color:var(--forest);margin-bottom:6px}
+.field input{width:100%;min-height:48px;padding:12px 14px;border:1.5px solid var(--line);border-radius:var(--r);background:var(--cream);color:var(--ink);font-size:1rem;transition:border-color .25s,box-shadow .25s}
+.field input:focus{outline:none;border-color:var(--forest);box-shadow:0 0 0 3px rgba(163,177,138,.45)}
+.field input:disabled{opacity:.65;cursor:not-allowed}
+.field.invalid input{border-color:var(--err)}
+.field-error{display:none;margin-top:5px;font-size:.88rem;color:var(--err)}
+.field.invalid .field-error{display:block}
+.btn-save{padding:12px 28px;border-radius:999px;background:var(--forest);color:var(--cream);border:2px solid var(--forest);font-family:var(--head);font-weight:600;font-size:.95rem;min-height:48px;transition:background .3s,color .3s,transform .3s}
+.btn-save:hover{background:var(--sage);color:var(--forest-deep);border-color:var(--sage);transform:translateY(-2px)}
+.save-note{display:none;font-family:var(--head);font-size:.9rem;font-weight:600;color:var(--forest-mid);margin-left:14px}
+.save-note.show{display:inline}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--line)}
+.toggle-row:last-child{border-bottom:0}
+.toggle-row strong{display:block;font-family:var(--head);font-weight:600;color:var(--forest)}
+.toggle-row span{font-size:.92rem;color:var(--ink-soft)}
+.switch{position:relative;display:inline-block;width:48px;height:28px;flex:none}
+.switch input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:2}
+.switch .track{position:absolute;inset:0;border-radius:999px;background:var(--sand-deep);transition:background .3s}
+.switch .track::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--cream);transition:transform .3s var(--ease)}
+.switch input:checked + .track{background:var(--forest)}
+.switch input:checked + .track::after{transform:translateX(20px)}
+.switch input:focus-visible + .track{outline:3px solid var(--sage);outline-offset:2px}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,24px);background:var(--forest);color:var(--cream);font-family:var(--head);font-weight:600;font-size:.92rem;padding:12px 20px;border-radius:999px;box-shadow:0 14px 30px rgba(21,42,30,.35);opacity:0;visibility:hidden;transition:opacity .3s,transform .3s var(--ease),visibility .3s;z-index:500;max-width:calc(100vw - 32px);text-align:center}
+.toast.show{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.empty-note{display:none;padding:18px 2px;color:var(--ink-soft)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1280px){
+  .chart-grid,.lower-grid{grid-template-columns:minmax(0,1fr)}
+  .stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:980px){
+  .sidebar{position:fixed;left:0;top:0;z-index:400;width:min(300px,84vw);transform:translateX(-100%);transition:transform .45s var(--ease),visibility .45s;box-shadow:0 0 60px rgba(0,0,0,.3);visibility:hidden}
+  .sidebar.open{transform:translateX(0);visibility:visible}
+  .sb-toggle{display:flex}
+  .tb-search{display:none}
+}
+@media (max-width:640px){
+  .topbar{padding:8px 14px}
+  .tb-title h1{font-size:1.2rem}
+  .tb-user{padding-left:12px}
+  .panel{padding:16px}
+  .stat-grid{grid-template-columns:minmax(0,1fr)}
+  .settings-grid{grid-template-columns:1fr}
+  .welcome{padding:30px 28px}
+  .chart-box{height:240px}
+  .btn-accent{width:100%;justify-content:center}
+  .gallery-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+}
+@media (max-width:380px){
+  .tb-bell{width:40px;height:40px}
+  .tb-title h1{font-size:1.05rem}
+  .gallery-grid{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .view-panel.active{animation:none}
+  .sidebar,.scrim,.toast{transition:none}
+}
+</style>
+</head>
+<body>
+<div class="scrim" id="scrim"></div>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Dashboard navigation">
+    <div class="sb-head"><a href="index.html" aria-label="Stackly Photography home"><img src="stackly-logo.webp" alt="Stackly Photography" onerror="this.outerHTML='<span class=&quot;wordmark&quot;>Stackly</span>'"></a></div>
+    <div class="sb-tag">CLIENT DASHBOARD</div>
+    <div class="sb-group"><div class="sb-nav">
+<a href="#" class="sb-link active" data-view="overview"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Overview</a>
+<a href="#" class="sb-link" data-view="galleries"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M21 16l-5-5-8 9"/></svg>My Galleries</a>
+<a href="#" class="sb-link" data-view="bookings"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>My Bookings</a>
+<a href="#" class="sb-link" data-view="shoots"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h2.5L9 4h6l1.5 2H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/></svg>Upcoming Shoots<span class="sb-badge">3</span></a>
+</div></div>
+<div class="sb-group"><div class="sb-label">ACCOUNT</div><div class="sb-nav">
+<a href="#" class="sb-link" data-view="invoices"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg>Invoices</a>
+<a href="#" class="sb-link" data-view="messages"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>Messages<span class="sb-badge">2</span></a>
+<a href="#" class="sb-link" data-view="settings"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Settings</a>
+</div></div>
+
+    <div class="sb-spacer"></div>
+    <div class="sb-profile">
+      <div class="sb-avatar" >P</div>
+      <div class="sb-profile-info"><strong id="sbName">Priya Ramesh</strong><span id="sbSub">priya.ramesh@email.com</span></div>
+    </div>
+    <div class="sb-foot">
+      <a href="index.html" class="sb-link"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Back to Home</a>
+      <a href="login.html" class="sb-link logout" id="logoutBtn"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 4H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h5M16 8l4 4-4 4M20 12H9"/></svg>Log Out</a>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <div class="tb-left">
+        <button class="sb-toggle" id="sbToggle" aria-label="Toggle menu" aria-controls="sidebar" aria-expanded="false"><span></span></button>
+        <div class="tb-title"><span class="tb-crumb">CLIENT DASHBOARD</span><h1 id="viewTitle">Overview</h1></div>
+      </div>
+      <div class="tb-right">
+        
+        <button class="tb-bell" aria-label="Notifications" data-toast="You are all caught up. No new notifications." onclick="error()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15z"/><path d="M10 21h4"/></svg></button>
+        <div class="tb-user"><div class="sb-avatar" onclick="error()">P</div><div class="tb-user-info"><strong id="tbName">Priya Ramesh</strong><span>Client</span></div></div>
+      </div>
+    </header>
+    <main class="content">
+<div class="view-panel active" data-view-panel="overview">
+<div class="welcome"><div><h2>Hello, <span id="welcomeName">Priya</span></h2><p>Your Yercaud sunrise gallery is ready, and your pre-wedding shoot is coming up this week.</p></div><a href="./404.html" class="btn-accent">Book a shoot</a></div>
+<section class="stat-grid"><div class="stat-card"><div class="stat-top"><div class="stat-icon ic-forest"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h2.5L9 4h6l1.5 2H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/></svg></div><span class="stat-delta up">▲ 2</span></div><div><div class="stat-val" data-count="6">0</div><div class="stat-label">Shoots booked</div></div></div><div class="stat-card"><div class="stat-top"><div class="stat-icon ic-sage"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M21 16l-5-5-8 9"/></svg></div><span class="stat-delta up">▲ 180</span></div><div><div class="stat-val" data-count="1240">0</div><div class="stat-label">Photos delivered</div></div></div><div class="stat-card"><div class="stat-top"><div class="stat-icon ic-bark"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div><span class="stat-delta up">▲ 1</span></div><div><div class="stat-val" data-count="4">0</div><div class="stat-label">Active galleries</div></div></div><div class="stat-card"><div class="stat-top"><div class="stat-icon ic-sand"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h13v4"/><path d="M3 7v11a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H5a2 2 0 0 1-2-2"/><circle cx="16.5" cy="14" r="1.2"/></svg></div><span class="stat-delta neutral">Due 20 Oct</span></div><div><div class="stat-val" data-prefix="₹" data-count="12500">0</div><div class="stat-label">Balance due</div></div></div></section>
+<section class="chart-grid">
+<div class="panel"><div class="panel-head"><div><span class="eyebrow">Delivery</span><h3>Photos delivered</h3></div></div><div class="chart-box"><canvas id="deliveredChart" aria-label="Photos delivered by month" role="img"></canvas></div></div>
+<div class="panel"><div class="panel-head"><div><span class="eyebrow">Mix</span><h3>Shoots by type</h3></div></div><div class="chart-box short"><canvas id="typeChart" aria-label="Shoots by type" role="img"></canvas></div><div class="legend-row" id="typeLegend"></div></div>
+</section>
+<div class="panel chart-wrap-gap"><div class="panel-head"><div><span class="eyebrow">Engagement</span><h3>Gallery views per month</h3></div></div><div class="chart-box short"><canvas id="viewsChart" aria-label="Gallery views per month" role="img"></canvas></div></div>
+<section class="lower-grid">
+<div class="panel" style="margin-bottom:0"><div class="panel-head"><div><span class="eyebrow">Coming up</span><h3>Next shoots</h3></div><a href="./404.html" class="panel-link">View all →</a></div><div class="plist-item"><div class="date-chip"><b>09</b><small>OCT</small></div><div class="plist-body"><strong>Pre-wedding shoot, Yercaud</strong><span>Confirmed · 5:30 AM · Golden hour</span></div><span class="plist-val">Confirmed</span></div><div class="plist-item"><div class="date-chip"><b>14</b><small>OCT</small></div><div class="plist-body"><strong>Portrait session</strong><span>Confirmed · 4:00 PM · Salem studio</span></div><span class="plist-val">Confirmed</span></div><div class="plist-item"><div class="date-chip"><b>24</b><small>OCT</small></div><div class="plist-body"><strong>Anniversary dinner coverage</strong><span>Awaiting advance · 7:00 PM · Salem</span></div><span class="plist-val">Pending</span></div></div>
+<div class="panel" style="margin-bottom:0"><div class="panel-head"><div><span class="eyebrow">Fresh</span><h3>Latest galleries</h3></div><a href="./404.html" class="panel-link" >View all →</a></div><div class="plist-item"><span class="plist-stage" style="background:var(--forest)"></span><div class="plist-body"><strong>Mehendi and sangeet</strong><span>312 photos · delivered</span></div><span class="plist-val">2d ago</span></div><div class="plist-item"><span class="plist-stage" style="background:var(--sage)"></span><div class="plist-body"><strong>Yercaud sunrise portraits</strong><span>86 photos · delivered</span></div><span class="plist-val">5d ago</span></div><div class="plist-item"><span class="plist-stage" style="background:var(--bark)"></span><div class="plist-body"><strong>Family portraits</strong><span>48 photos · delivered</span></div><span class="plist-val">1w ago</span></div><div class="plist-item"><span class="plist-stage" style="background:var(--tan,#c9b98f)"></span><div class="plist-body"><strong>Temple festival, Salem</strong><span>794 photos · delivered</span></div><span class="plist-val">2w ago</span></div></div>
+</section>
+</div>
+<div class="view-panel" data-view-panel="galleries"><div class="panel"><div class="panel-head"><div><span class="eyebrow">Your frames</span><h3>My galleries</h3></div></div><div class="gallery-grid"><article class="gallery-card"><div class="thumb"><img src="./assets/a4.webp" alt="Mehendi and sangeet" loading="lazy" onerror="this.style.visibility='hidden'"></div><div class="gc-body"><h4>Mehendi and sangeet</h4><span class="gc-meta">312 photos · Wedding</span><div class="gc-foot"><span class="tag ok">Delivered</span><button type="button" class="btn-mini" onclick="error()">Open</button></div></div></article><article class="gallery-card"><div class="thumb"><img src="./assets/c16.webp" alt="Yercaud sunrise portraits" loading="lazy" onerror="this.style.visibility='hidden'"></div><div class="gc-body"><h4>Yercaud sunrise portraits</h4><span class="gc-meta">86 photos · Portrait</span><div class="gc-foot"><span class="tag ok">Delivered</span><button type="button" class="btn-mini" onclick="error()">Open</button></div></div></article><article class="gallery-card"><div class="thumb"><img src="./assets/b2.webp" alt="Family portraits" loading="lazy" onerror="this.style.visibility='hidden'"></div><div class="gc-body"><h4>Family portraits</h4><span class="gc-meta">48 photos · Portrait</span><div class="gc-foot"><span class="tag ok">Delivered</span><button type="button" class="btn-mini" onclick="error()">Open</button></div></div></article><article class="gallery-card"><div class="thumb"><img src="./assets/a7.webp" alt="Temple festival, Salem" loading="lazy" onerror="this.style.visibility='hidden'"></div><div class="gc-body"><h4>Temple festival, Salem</h4><span class="gc-meta">794 photos · Event</span><div class="gc-foot"><span class="tag ok">Delivered</span><button type="button" class="btn-mini" onclick="error()">Open</button></div></div></article><article class="gallery-card"><div class="thumb"><img src="./assets/c14.webp" alt="Forest morning walk" loading="lazy" onerror="this.style.visibility='hidden'"></div><div class="gc-body"><h4>Forest morning walk</h4><span class="gc-meta">Editing in progress · Travel</span><div class="gc-foot"><span class="tag warn">Editing</span><button type="button" class="btn-mini" onclick="error()">Open</button></div></div></article><article class="gallery-card"><div class="thumb"><img src="./assets/a5.webp" alt="Lakeside engagement" loading="lazy" onerror="this.style.visibility='hidden'"></div><div class="gc-body"><h4>Lakeside engagement</h4><span class="gc-meta">Shoot scheduled · Couple</span><div class="gc-foot"><span class="tag muted">Upcoming</span><button type="button" class="btn-mini" onclick="error()">Open</button></div></div></article></div></div></div>
+<div class="view-panel" data-view-panel="bookings"><div class="panel"><div class="panel-head"><div><span class="eyebrow">History</span><h3>Booking history</h3></div></div><div class="table-wrap"><table class="dtable"><thead><tr><th>Ref</th><th>Date</th><th>Shoot</th><th>Package</th><th>Status</th><th>Amount</th></tr></thead><tbody><tr><td>BK-2041</td><td>28 Sep 2026</td><td>Mehendi and sangeet</td><td>Wedding day</td><td><span class="tag ok">Completed</span></td><td class="amt">₹45,000</td></tr><tr><td>BK-1988</td><td>12 Aug 2026</td><td>Yercaud sunrise</td><td>Portrait session</td><td><span class="tag ok">Completed</span></td><td class="amt">₹8,000</td></tr><tr><td>BK-1930</td><td>03 Jul 2026</td><td>Family portraits</td><td>Portrait session</td><td><span class="tag ok">Completed</span></td><td class="amt">₹10,500</td></tr><tr><td>BK-1874</td><td>18 Jun 2026</td><td>Temple festival</td><td>Event coverage</td><td><span class="tag ok">Completed</span></td><td class="amt">₹18,000</td></tr><tr><td>BK-2107</td><td>09 Oct 2026</td><td>Pre-wedding, Yercaud</td><td>Wedding day</td><td><span class="tag warn">Confirmed</span></td><td class="amt">₹32,000</td></tr><tr><td>BK-2119</td><td>24 Oct 2026</td><td>Anniversary dinner</td><td>Event coverage</td><td><span class="tag muted">Awaiting advance</span></td><td class="amt">₹12,500</td></tr></tbody></table></div></div></div>
+<div class="view-panel" data-view-panel="shoots"><div class="panel"><div class="panel-head"><div><span class="eyebrow">Calendar</span><h3>Upcoming shoots</h3></div></div><div class="plist-item"><div class="date-chip"><b>09</b><small>OCT</small></div><div class="plist-body"><strong>Pre-wedding shoot, Yercaud</strong><span>Confirmed · 5:30 AM · Meet at the lake viewpoint</span></div><span class="plist-val">Confirmed</span></div><div class="plist-item"><div class="date-chip"><b>14</b><small>OCT</small></div><div class="plist-body"><strong>Portrait session</strong><span>Confirmed · 4:00 PM · Salem studio</span></div><span class="plist-val">Confirmed</span></div><div class="plist-item"><div class="date-chip"><b>24</b><small>OCT</small></div><div class="plist-body"><strong>Anniversary dinner coverage</strong><span>Awaiting advance · 7:00 PM · Salem</span></div><span class="plist-val">Pending</span></div><div class="plist-item"><div class="date-chip"><b>08</b><small>NOV</small></div><div class="plist-body"><strong>Lakeside engagement</strong><span>Proposed · 6:00 AM · Yercaud</span></div><span class="plist-val">Proposed</span></div></div></div>
+<div class="view-panel" data-view-panel="invoices"><div class="panel"><div class="panel-head"><div><span class="eyebrow">Billing</span><h3>Invoices</h3></div></div><div class="table-wrap"><table class="dtable"><thead><tr><th>Invoice</th><th>Date</th><th>Shoot</th><th>Amount</th><th>Status</th><th>Download</th></tr></thead><tbody><tr><td>INV-5120</td><td>28 Sep 2026</td><td>Mehendi and sangeet</td><td class="amt">₹45,000</td><td><span class="tag ok">Paid</span></td><td><button type="button" class="btn-mini" onclick="error()">PDF</button></td></tr><tr><td>INV-5044</td><td>12 Aug 2026</td><td>Yercaud sunrise</td><td class="amt">₹8,000</td><td><span class="tag ok">Paid</span></td><td><button type="button" class="btn-mini" onclick="error()">PDF</button></td></tr><tr><td>INV-4971</td><td>03 Jul 2026</td><td>Family portraits</td><td class="amt">₹10,500</td><td><span class="tag ok">Paid</span></td><td><button type="button" class="btn-mini" onclick="error()">PDF</button></td></tr><tr><td>INV-5188</td><td>05 Oct 2026</td><td>Pre-wedding, Yercaud</td><td class="amt">₹12,500</td><td><span class="tag warn">Due 20 Oct</span></td><td><button type="button" class="btn-mini"onclick="error()">PDF</button></td></tr></tbody></table></div></div></div>
+<div class="view-panel" data-view-panel="messages"><div class="panel"><div class="panel-head"><div><span class="eyebrow">Inbox</span><h3>Messages</h3></div></div><div class="msg-item"><div class="client-avatar">SP</div><div class="msg-body"><strong>Stackly Photography</strong><span class="unread" aria-label="Unread"></span><p>Your Yercaud sunrise gallery is ready to view and download.</p></div><span class="msg-time">Today</span></div><div class="msg-item"><div class="client-avatar">AK</div><div class="msg-body"><strong>Aravind K.</strong><span class="unread" aria-label="Unread"></span><p>Weather looks clear for the 9th. Please arrive by 5:15 AM at the lake viewpoint.</p></div><span class="msg-time">Yesterday</span></div><div class="msg-item"><div class="client-avatar">NS</div><div class="msg-body"><strong>Nandhini S.</strong><p>Colour grading for the mehendi set is finished. Let us know if you want warmer tones.</p></div><span class="msg-time">3 days ago</span></div><div class="msg-item"><div class="client-avatar">SP</div><div class="msg-body"><strong>Stackly Photography</strong><p>Welcome to your client portal.</p></div><span class="msg-time">2 weeks ago</span></div></div></div>
+<div class="view-panel" data-view-panel="settings">
+<div class="panel"><div class="panel-head"><div><span class="eyebrow">Account</span><h3>Profile</h3></div></div>
+<form id="settingsForm" novalidate><div class="settings-grid">
+<div class="field" id="fld-setName"><label for="setName">Name</label><input type="text" id="setName" value="Priya" autocomplete="given-name" maxlength="30"><span class="field-error">Enter 2 to 30 letters only, with no spaces, numbers or symbols.</span></div>
+<div class="field" id="fld-setEmail"><label for="setEmail">Email address</label><input type="email" id="setEmail" value="priya.ramesh@email.com" autocomplete="email" maxlength="60"><span class="field-error">Enter a valid email address, without spaces.</span></div>
+<div class="field"><label for="setExtra">Client since</label><input type="text" id="setExtra" value="2026 · Studio member" disabled></div>
+<div class="field" id="fld-setPhone"><label for="setPhone">Mobile number</label><input type="text" id="setPhone" inputmode="numeric" maxlength="10" value="9845067890" autocomplete="tel"><span class="field-error">Enter a 10-digit mobile number starting with 6 to 9, digits only, no spaces.</span></div>
+</div><button type="submit" class="btn-save">Save changes</button></form></div>
+<div class="panel"><div class="panel-head"><div><span class="eyebrow">Preferences</span><h3>Notifications</h3></div></div><div class="toggle-row"><div><strong>Gallery ready alerts</strong><span>Tell me when a new gallery is delivered</span></div><label class="switch"><input type="checkbox" aria-label="Gallery ready alerts" checked><span class="track"></span></label></div><div class="toggle-row"><div><strong>Shoot reminders</strong><span>Reminders the day before each shoot</span></div><label class="switch"><input type="checkbox" aria-label="Shoot reminders" checked><span class="track"></span></label></div><div class="toggle-row"><div><strong>Invoice alerts</strong><span>Notify me when a new invoice is issued</span></div><label class="switch"><input type="checkbox" aria-label="Invoice alerts" checked><span class="track"></span></label></div></div>
+</div>
+    </main>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+(function(){
+  var ROLE = 'client';            /* 'client' or 'admin' */
+  var OTHER_PAGE = 'admin-dashboard.html';     /* where the opposite role is sent */
+  var PAGE_KEY = 'stackly_photo_view_' + ROLE;
+  var $ = function(id){ return document.getElementById(id); };
+
+  /* ---------- session + role guard ---------- */
+  var store = null;
+  try{
+    store = localStorage.getItem('stackly_role') ? localStorage : sessionStorage;
+    var role = store.getItem('stackly_role'), name = store.getItem('stackly_name'), email = store.getItem('stackly_email');
+    if(role && role !== ROLE){ window.location.replace(OTHER_PAGE); }
+    if(name && name.trim()){
+      name = name.trim();
+      $('sbName').textContent = name; $('tbName').textContent = name;
+      var ini = name.charAt(0).toUpperCase();
+      document.querySelectorAll('.sb-profile .sb-avatar,.tb-user .sb-avatar').forEach(function(a){ a.textContent = ini; });
+      $('setName').value = name.split(' ')[0];
+      $('welcomeName').textContent = name.split(' ')[0];
+    }
+    if(email){
+      $('setEmail').value = email; $('sbSub').textContent = email;
+      var users = JSON.parse(localStorage.getItem('stackly_users') || '{}'), u = users[email];
+      if(u && u.mobile) $('setPhone').value = u.mobile;
+    }
+  }catch(e){}
+
+  $('logoutBtn').addEventListener('click', function(){
+    try{ ['stackly_role','stackly_name','stackly_email','stackly_session'].forEach(function(k){ localStorage.removeItem(k); sessionStorage.removeItem(k); }); }catch(e){}
+  });
+
+  /* ---------- toast ---------- */
+  var toastEl = $('toast'), toastTimer;
+  function toast(msg){
+    toastEl.textContent = msg; toastEl.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 2600);
+  }
+  document.addEventListener('click', function(e){
+    var t = e.target.closest('[data-toast]');
+    if(t){ e.preventDefault(); toast(t.getAttribute('data-toast')); }
+  });
+
+  /* ---------- input filters + validators ---------- */
+  /* name: letters only, no spaces | email: no spaces | mobile: digits only, no spaces */
+  function guard(i, re){
+    i.addEventListener('keydown', function(e){ if(e.key === ' ') e.preventDefault(); });
+    i.addEventListener('input', function(){ var c = i.value.replace(re, ''); if(c !== i.value) i.value = c; });
+  }
+  var setName = $('setName'), setEmail = $('setEmail'), setPhone = $('setPhone');
+  guard(setName, /[^A-Za-z]/g); guard(setEmail, /\s/g); guard(setPhone, /[^0-9]/g);
+  function isName(v){ return /^[A-Za-z]{2,30}$/.test(v); }
+  function isPhone(v){ return /^[6-9][0-9]{9}$/.test(v); }
+  function isEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v); }
+  function mark(id, ok){ $(id).classList.toggle('invalid', !ok); }
+  [['fld-setName',setName],['fld-setEmail',setEmail],['fld-setPhone',setPhone]].forEach(function(p){
+    p[1].addEventListener('input', function(){ $(p[0]).classList.remove('invalid'); });
+  });
+  $('settingsForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var a = isName(setName.value.trim()), b = isEmail(setEmail.value.trim()), c = isPhone(setPhone.value.trim());
+    mark('fld-setName', a); mark('fld-setEmail', b); mark('fld-setPhone', c);
+    if(!a || !b || !c){
+      var bad = !a ? setName : (!b ? setEmail : setPhone); bad.focus();
+      return;
+    }
+    try{
+      var st = store || sessionStorage;
+      st.setItem('stackly_name', setName.value.trim()); st.setItem('stackly_email', setEmail.value.trim().toLowerCase());
+      sessionStorage.setItem(PAGE_KEY, currentView);
+    }catch(err){}
+    window.location.href = '404.html';
+  });
+
+  /* ---------- view switching ---------- */
+  var titles = {"overview": "Overview", "galleries": "My Galleries", "bookings": "My Bookings", "shoots": "Upcoming Shoots", "invoices": "Invoices", "messages": "Messages", "settings": "Settings"};
+  var currentView = 'overview';
+  var searchInput = $('globalSearch');
+  function switchToView(t, silent){
+    if(!titles[t]) t = 'overview';
+    document.querySelectorAll('.sb-link[data-view]').forEach(function(l){ l.classList.toggle('active', l.dataset.view === t); });
+    $('viewTitle').textContent = titles[t];
+    document.querySelectorAll('.view-panel').forEach(function(v){ v.classList.toggle('active', v.getAttribute('data-view-panel') === t); });
+    currentView = t;
+    if(searchInput){ searchInput.value = ''; runSearch(''); }
+    try{ sessionStorage.setItem(PAGE_KEY, t); }catch(e){}
+    if(!silent) window.scrollTo({top:0, behavior:'smooth'});
+  }
+  document.querySelectorAll('[data-view]').forEach(function(l){
+    l.addEventListener('click', function(e){ e.preventDefault(); switchToView(this.dataset.view); if(window.innerWidth <= 980) closeSidebar(); });
+  });
+  try{ var saved = sessionStorage.getItem(PAGE_KEY); if(saved && saved !== 'overview') switchToView(saved, true); }catch(e){}
+
+  /* ---------- search the visible view ---------- */
+  function runSearch(q){
+    q = q.trim().toLowerCase();
+    var panel = document.querySelector('.view-panel.active'); if(!panel) return;
+    panel.querySelectorAll('.dtable tbody tr, .plist-item, .gallery-card, .team-card, .report-card, .msg-item').forEach(function(el){
+      el.style.display = (!q || el.textContent.toLowerCase().indexOf(q) > -1) ? '' : 'none';
+    });
+  }
+  if(searchInput) searchInput.addEventListener('input', function(){ runSearch(searchInput.value); });
+
+  /* ---------- mobile drawer ---------- */
+  var sidebar = $('sidebar'), scrim = $('scrim'), tog = $('sbToggle');
+  function openSidebar(){ sidebar.classList.add('open'); scrim.classList.add('show'); tog.setAttribute('aria-expanded','true'); }
+  function closeSidebar(){ sidebar.classList.remove('open'); scrim.classList.remove('show'); tog.setAttribute('aria-expanded','false'); }
+  tog.addEventListener('click', function(){ sidebar.classList.contains('open') ? closeSidebar() : openSidebar(); });
+  scrim.addEventListener('click', closeSidebar);
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeSidebar(); });
+  window.addEventListener('resize', function(){ if(window.innerWidth > 980) closeSidebar(); });
+
+  /* ---------- panel tabs (chart range) ---------- */
+  document.querySelectorAll('.panel-tabs button').forEach(function(b){
+    b.addEventListener('click', function(){
+      b.parentNode.querySelectorAll('button').forEach(function(x){ x.classList.toggle('active', x === b); });
+      if(window.__onRange) window.__onRange(b.getAttribute('data-range'));
+    });
+  });
+
+  /* ---------- counters, entrance, charts ---------- */
+  function animateCounters(){
+    document.querySelectorAll('.stat-val[data-count]').forEach(function(el){
+      var end = parseFloat(el.dataset.count), pre = el.dataset.prefix || '', suf = el.dataset.suffix || '';
+      var dec = (el.dataset.count.split('.')[1] || '').length, o = {v:0};
+      function fmt(n){ return pre + (dec ? n.toFixed(dec) : Math.round(n).toLocaleString('en-IN')) + suf; }
+      if(window.gsap) gsap.to(o, {v:end, duration:1.4, ease:'power2.out', delay:.3, onUpdate:function(){ el.textContent = fmt(o.v); }});
+      else el.textContent = fmt(end);
+    });
+  }
+  function fallbackCharts(){
+    document.querySelectorAll('.chart-box').forEach(function(b){ b.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:.95rem;color:var(--ink-soft);text-align:center;padding:0 16px">Chart library failed to load. Check your connection and refresh.</div>'; });
+  }
+  function legend(id, labels, colors, vals){
+    var el = $(id); if(!el) return;
+    el.innerHTML = labels.map(function(l, i){ return '<span class="legend-item"><span class="legend-dot" style="background:'+colors[i]+'"></span>'+l+(vals ? ' · '+vals[i] : '')+'</span>'; }).join('');
+  }
+  var GRID = 'rgba(31,61,43,0.09)', AXIS = 'rgba(31,61,43,0.2)';
+  var TIP = {backgroundColor:'#1f3d2b', padding:10, cornerRadius:8, titleFont:{family:"'Bricolage Grotesque',sans-serif"}, bodyFont:{family:"'Newsreader',serif"}};
+  var C = {forest:'#1f3d2b', mid:'#2c5a40', sage:'#a3b18a', bark:'#4a3b2a', tan:'#c9b98f'};
+
+  function initCharts(){
+    if(!window.Chart){ fallbackCharts(); return; }
+    Chart.defaults.font.family = "'Newsreader',serif"; Chart.defaults.font.size = 13; Chart.defaults.color = '#5a5a48';
+    
+    var dc = $('deliveredChart').getContext('2d');
+    new Chart(dc,{type:'bar',data:{labels:['Apr','May','Jun','Jul','Aug','Sep'],datasets:[{data:[90,220,310,150,260,210],backgroundColor:C.forest,borderRadius:8,maxBarThickness:46}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:Object.assign({callbacks:{label:function(c){return c.parsed.y+' photos delivered';}}},TIP)},
+      scales:{x:{grid:{display:false},border:{color:AXIS}},y:{grid:{color:GRID},border:{display:false}}}}});
+    var tl=['Wedding','Portrait','Event','Travel'], tc=[C.forest,C.sage,C.bark,C.tan], tv=[2,2,1,1];
+    new Chart($('typeChart'),{type:'doughnut',data:{labels:tl,datasets:[{data:tv,backgroundColor:tc,borderColor:'#fbf7ea',borderWidth:3}]},
+      options:{responsive:true,maintainAspectRatio:false,cutout:'66%',plugins:{legend:{display:false},tooltip:Object.assign({callbacks:{label:function(c){return c.label+': '+c.parsed+' shoots';}}},TIP)}}});
+    legend('typeLegend',tl,tc,tv.map(function(v){return v+' shoots';}));
+    var vc = $('viewsChart').getContext('2d');
+    var g = vc.createLinearGradient(0,0,0,230); g.addColorStop(0,'rgba(163,177,138,.55)'); g.addColorStop(1,'rgba(163,177,138,0)');
+    new Chart(vc,{type:'line',data:{labels:['Apr','May','Jun','Jul','Aug','Sep'],datasets:[{data:[40,130,260,180,300,360],borderColor:C.mid,backgroundColor:g,fill:true,tension:.38,borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#fbf7ea',pointBorderColor:C.mid,pointBorderWidth:2}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:Object.assign({callbacks:{label:function(c){return c.parsed.y+' views';}}},TIP)},
+      scales:{x:{grid:{display:false},border:{color:AXIS}},y:{grid:{color:GRID},border:{display:false}}}}});
+
+  }
+
+  function boot(){
+    if(window.gsap){
+      gsap.from('.welcome,.stat-card', {opacity:0, y:16, duration:.6, stagger:.08, ease:'power3.out', delay:.05, clearProps:'all'});
+      gsap.from('.view-panel.active .panel', {opacity:0, y:16, duration:.6, stagger:.06, ease:'power3.out', delay:.25, clearProps:'all'});
+    }
+    animateCounters(); initCharts();
+  }
+  function loadFallback(url, cb){ var s = document.createElement('script'); s.src = url; s.onload = function(){ cb(); }; s.onerror = function(){ cb(); }; document.head.appendChild(s); }
+  function start(){
+    var pending = 0;
+    function maybe(){ if(pending <= 0) boot(); }
+    if(!window.Chart){ pending++; loadFallback('https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js', function(){ pending--; maybe(); }); }
+    if(!window.gsap){ pending++; loadFallback('https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js', function(){ pending--; maybe(); }); }
+    maybe();
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+})();
+function error(){
+  window.location.href="404.html";
+}
+</script>
+</body>
+</html>
